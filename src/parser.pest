@@ -1,0 +1,25 @@
+WS = _{(" "| "\t"| "\n")+}
+
+LEFT_PAREN = _{"("}
+RIGHT_PAREN = _{")"}
+
+COMMA = {";"}
+
+LEFT_BRACKET = _{"{"}
+RIGHT_BRACKET = _{"}"}
+
+IDENT = {(ASCII_ALPHA)~(ASCII_ALPHA|ASCII_DIGIT)* }
+
+LET = {"let"}
+LET_MUT = {"let"}
+
+LET_EXPR = { (LET | LET_MUT) ~ ws+ ~ IDENT ~ ws* ~ "=" ~ ws* ~ COMMA}
+
+FN_DEF = {"fun" ~ ws+ ~ IDENT ~ ws* ~ LEFT_PAREN ~ ws* ~ RIGHT_PAREN ~ ws* ~ BODY}
+
+BODY = {LEFT_BRACKET ~ ws* ~ RIGHT_BRACKET}
+
+TOKEN = _{( FN_DEF )}
+
+
+FILE = _{ SOI ~ (TOKEN|WS)* ~ EOI }
