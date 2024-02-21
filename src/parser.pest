@@ -1,4 +1,4 @@
-WS = _{(" "| "\t"| "\n")+}
+WS = _{ " " | "\t" | "\r" | "\n" }
 
 LEFT_PAREN = _{"("}
 RIGHT_PAREN = _{")"}
@@ -8,16 +8,66 @@ COMMA = {";"}
 LEFT_BRACKET = _{"{"}
 RIGHT_BRACKET = _{"}"}
 
-IDENT = {(ASCII_ALPHA)~(ASCII_ALPHA|ASCII_DIGIT)* }
+IDENT = {!BOOL ~ (ASCII_ALPHA)~(ASCII_ALPHA|ASCII_DIGIT)* }
+
+
+S_INT = {(("-"|"+") ~ ASCII_DIGIT+)}
+
+U_INT = {(ASCII_DIGIT)+}
+
+INT = {(
+      S_INT
+      |U_INT
+      )}
+
+
+FLOAT = {(
+          ((ASCII_DIGIT)+ ~ "." ~ (ASCII_DIGIT)*)
+          |("."~ASCII_DIGIT+)
+        )}
+
+BOOL = { "true" | "false"}
+
+STRING = ${ "\"" ~ INNER ~ "\"" }
+
+INNER = @{ CHAR_INNER* }
+
+CHAR_INNER = {
+    !("\"" | "\\") ~ ANY
+    | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+    | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
+CHAR = {"'" ~ CHAR_INNER ~ "'"}
+
+ATOM = {(
+      IDENT 
+      | FLOAT 
+      | INT 
+      | CHAR 
+      | STRING 
+      | BOOL 
+)}
+
+EXPR = {
+  (
+  ATOM
+  |(LEFT_PAREN ~ WS* ~ EXPR ~ WS* ~ RIGHT_PAREN)
+  )
+}
+
+
+
 
 LET = {"let"}
-LET_MUT = {"let"}
+LET_MUT = {"letm"}
 
-LET_EXPR = { (LET | LET_MUT) ~ ws+ ~ IDENT ~ ws* ~ "=" ~ ws* ~ COMMA}
+LET_EXPR = { (LET_MUT | LET) ~ WS+ ~ IDENT ~ WS* ~ "=" ~ WS* ~ EXPR ~ WS* ~ COMMA}
 
-FN_DEF = {"fun" ~ ws+ ~ IDENT ~ ws* ~ LEFT_PAREN ~ ws* ~ RIGHT_PAREN ~ ws* ~ BODY}
+STATEMENT = {(LET_EXPR)}
 
-BODY = {LEFT_BRACKET ~ ws* ~ RIGHT_BRACKET}
+FN_DEF = {"fun" ~ WS+ ~ IDENT ~ WS* ~ LEFT_PAREN ~ WS* ~ RIGHT_PAREN ~ WS* ~ BODY}
+
+BODY = {LEFT_BRACKET ~ WS* ~ (WS* ~ STATEMENT)* ~ WS*  ~ RIGHT_BRACKET}
 
 TOKEN = _{( FN_DEF )}
 

@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 pest = "*"
 pest_derive = "*"
+qbe = "*"
+structopt = { version = "*", default-features = false }
