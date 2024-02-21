@@ -3,7 +3,7 @@ WS = _{ " " | "\t" | "\r" | "\n" }
 LEFT_PAREN = _{"("}
 RIGHT_PAREN = _{")"}
 
-COMMA = {";"}
+COMMA = _{";"}
 
 LEFT_BRACKET = _{"{"}
 RIGHT_BRACKET = _{"}"}
@@ -62,10 +62,13 @@ LET = {"let"}
 LET_MUT = {"letm"}
 
 LET_EXPR = { (LET_MUT | LET) ~ WS+ ~ IDENT ~ WS* ~ "=" ~ WS* ~ EXPR ~ WS* ~ COMMA}
+RETURN = {"ret" ~ WS+ ~ EXPR ~ WS* ~ COMMA}
 
-STATEMENT = {(LET_EXPR)}
+STATEMENT = {(LET_EXPR|IF|RETURN)}
 
 FN_DEF = {"fun" ~ WS+ ~ IDENT ~ WS* ~ LEFT_PAREN ~ WS* ~ RIGHT_PAREN ~ WS* ~ BODY}
+
+IF = {"if" ~ WS+ ~ EXPR ~ WS* ~ BODY}
 
 BODY = {LEFT_BRACKET ~ WS* ~ (WS* ~ STATEMENT)* ~ WS*  ~ RIGHT_BRACKET}
 
