@@ -3,7 +3,8 @@ WS = _{ " " | "\t" | "\r" | "\n" }
 LEFT_PAREN = _{"("}
 RIGHT_PAREN = _{")"}
 
-COMMA = _{";"}
+SEMICOLON = _{";"}
+COMMA = _{","}
 
 LEFT_BRACKET = _{"{"}
 RIGHT_BRACKET = _{"}"}
@@ -55,18 +56,30 @@ EXPR = {
   )
 }
 
+TYPE = {
+  IDENT
+    |"int"
+    |"uint"
+    |"float"
+    |"bool"
+}
 
 
+TYPEOF = {(":" ~ WS* ~ TYPE)}
 
 LET = {"let"}
 LET_MUT = {"letm"}
+LET_EXPR = { (LET_MUT | LET) ~ WS+ ~ IDENT ~ WS* ~ (TYPEOF)? ~ WS* ~ "=" ~ WS* ~ EXPR ~ WS*  ~ WS* ~ SEMICOLON}
+RETURN = {"ret" ~ WS+ ~ EXPR ~ WS* ~ SEMICOLON}
 
-LET_EXPR = { (LET_MUT | LET) ~ WS+ ~ IDENT ~ WS* ~ "=" ~ WS* ~ EXPR ~ WS* ~ COMMA}
-RETURN = {"ret" ~ WS+ ~ EXPR ~ WS* ~ COMMA}
+STATEMENT = _{(LET_EXPR|IF|RETURN)}
 
-STATEMENT = {(LET_EXPR|IF|RETURN)}
+FN_ARGS={
+  (IDENT ~ WS* ~ TYPEOF ~ WS* ~ (COMMA ~ WS* ~ IDENT ~ WS* ~ TYPEOF)+)
+    |(IDENT ~ WS* ~ TYPEOF)
+}
 
-FN_DEF = {"fun" ~ WS+ ~ IDENT ~ WS* ~ LEFT_PAREN ~ WS* ~ RIGHT_PAREN ~ WS* ~ BODY}
+FN_DEF = {"fun" ~ WS+ ~ IDENT ~ WS* ~ LEFT_PAREN ~ WS* ~ FN_ARGS? ~ WS* ~ RIGHT_PAREN ~ WS* ~ TYPEOF ~ WS* ~ BODY}
 
 IF = {"if" ~ WS+ ~ EXPR ~ WS* ~ BODY}
 
